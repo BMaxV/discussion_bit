@@ -59,6 +59,12 @@ class DiscussionBit:
         self.other=other
         self.author=author
         self.hexhash=hexhash
+        self.hex_int=None
+        self.update_hexhash()
+        
+    def __hash__(self):
+        self.update_hexhash()
+        return self.hex_int
     
     def __eq__(self,other):
         if type(other)!=type(self):
@@ -66,12 +72,24 @@ class DiscussionBit:
         if self.text==other.text:
             return True
         return False
+    
+    def write(self):
+        with open(self.hexhash+".txt","w") as f:
+            f.write(str(self))
+            
+    @classmethod
+    def reconstruct_from_file(self,fn):
+        with open(fn,"r") as f:
+            s=f.read()
+        kwargs=json.loads(s)
+        return DiscussionBit(**kwargs)
         
     def update_hexhash(self):
         if self.context!=None:
             hexhash=hashlib.sha256((self.text+self.context).encode())
         else:
             hexhash=hashlib.sha256(self.text.encode())
+        self.hex_int=int(hexhash.hexdigest(),16)
         self.hexhash=hexhash.hexdigest()
             
     def __repr__(self):
@@ -99,5 +117,70 @@ def test():
     print(new)
     print(Dbit==new)
     
+def test2_read_write():
+    a=DiscussionBit("a")
+    b=DiscussionBit("b")
+    
+    a.write()
+    a_copy=DiscussionBit.reconstruct_from_file(a.hexhash+".txt")
+    print(a==a_copy)
+    
+    b.write()
+    b_copy=DiscussionBit.reconstruct_from_file(b.hexhash+".txt")
+    print(b==b_copy)
+    
+
+def fuse(dict_of_bits):
+    s=""
+    #find the root.
+    
+    referenced={}
+    refering={}
+    for xkey in dict_of_bits:
+        x=dict_of_bits[xkey]
+        if x.context in dict_of_bits:
+            refering[xkey]=x.context
+            if x.context not in referenced:
+                referenced[x.context]=[]
+            referenced[x.context].append(xkey)
+    print("referenced",referenced)
+    print("refering",refering)
+        
+    roots=[]
+    referenced_keys=set(referenced.keys())
+    refering_keys=set(refering.keys())
+    roots=list(referenced_keys.difference(refering_keys))
+    
+    #root is/are the one that is not refering and referenced.
+    #print root as init. then print all refering arguments,
+    #loop util done.
+    working_list=roots
+    print("wl",working_list)
+    l=0
+    while True:
+        new_list=[]
+        for x in working_list:
+            
+            ob=dict_of_bits[x]
+            print("t",ob.text)
+            s+=l*2*" "+"'"+ob.text+"' by '"+ob.author+"'\n"
+            #print(x)
+            if x in referenced:
+                print(referenced[x])
+                new_list+=referenced[x]
+        working_list=new_list
+        l+=1
+        if working_list==[]:
+            break
+            
+    return s
+    
+def test_fuse():
+    a=DiscussionBit("The world is flat",author="some idiot")
+    b=DiscussionBit("That's stupid",context=a.hexhash,author="me")
+    r=fuse({a.hexhash:a,b.hexhash:b})
+    print(r)
+    
 if __name__=="__main__":
-    test()
+    test_fuse()
+    #test2_read_write()
