@@ -71,6 +71,7 @@ class DiscussionBit:
         self.author = author
         self.hexhash = hexhash
         self.hex_int = None
+        self.timestamp=timestamp
         self.update_hexhash()
 
     def __hash__(self):
