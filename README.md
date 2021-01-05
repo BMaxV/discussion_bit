@@ -10,6 +10,6 @@ python3 setup.py install --user
 
 use with
  
-from discussion_bit import format
+from discussion_bit import dcformat
 
-format.DiscussionBit
+dcformat.DiscussionBit
