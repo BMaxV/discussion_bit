@@ -53,6 +53,8 @@ class DiscussionBit:
     text='merge into master' context='thepatch'
 
     all of which can make sense in the right context.
+    
+    * timestamps can be useful but aren't required.
     """
 
     def __init__(
@@ -61,6 +63,7 @@ class DiscussionBit:
             context=None,
             other=None,
             author=None,
+            timestamp=None,
             hexhash=None):
         self.text = text
         self.context = context
