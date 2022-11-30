@@ -65,6 +65,7 @@ class DiscussionBit:
             author=None,
             timestamp=None,
             hexhash=None):
+        
         self.text = text
         self.context = context
         self.other = other
@@ -94,6 +95,7 @@ class DiscussionBit:
         with open(fn, "r") as f:
             s = f.read()
         kwargs = json.loads(s)
+        print("dc kwargs",kwargs)
         return DiscussionBit(**kwargs)
 
     def update_hexhash(self):
@@ -111,8 +113,15 @@ class DiscussionBit:
              'other': self.other,
              'author': self.author,
              'hexhash': self.hexhash}
-
-        return json.dumps(d)
+        s=""
+        s="< DiscussionBit "
+        s+=", test:"+str(self.text)
+        s+=", context:"+str(self.context)
+        s+=", other:"+str(self.other)
+        s+=", author:"+str(self.author)
+        s+=", hexhash:"+str(self.hexhash)
+        s+=">"
+        return s#json.dumps(d)
 
 
 def from_json(json_str):
@@ -195,4 +204,4 @@ def test_fuse():
 
 if __name__ == "__main__":
     test_fuse()
-    # test2_read_write()
+    test2_read_write()
